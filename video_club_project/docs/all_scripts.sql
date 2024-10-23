@@ -646,3 +646,98 @@ INSERT INTO tmp_videoclub (id_copia,fecha_alquiler_texto,dni,nombre,apellido_1,a
 	 (305,'2024-01-22','5653366N','Maria nieves','Lozano','Leon','maria nieves.lozano.leon@gmail.com','680082585','47003','2002-01-06','21','2','Der.','Hernán Cortés','2Der.','La doncella','Thriller','Corea, década de 1930, durante la colonización japonesa. Una joven llamada Sookee es contratada como doncella de una rica mujer japonesa, Hideko, que vive recluida en una gran mansión bajo la influencia de un tirano. Sookee guarda un secreto y con la ayuda de un estafador que se hace pasar por un conde japonés, planea algo para Hideko.','Park Chan-wook','2024-01-22',NULL),
 	 (306,'2024-01-07','6810904Y','Hugo','Torres','Ferrer','hugo.torres.ferrer@gmail.com','649016903','47006','1994-06-05','50','1','Der.','Federico García Lorca','1Der.','La doncella','Thriller','Corea, década de 1930, durante la colonización japonesa. Una joven llamada Sookee es contratada como doncella de una rica mujer japonesa, Hideko, que vive recluida en una gran mansión bajo la influencia de un tirano. Sookee guarda un secreto y con la ayuda de un estafador que se hace pasar por un conde japonés, planea algo para Hideko.','Park Chan-wook','2024-01-07','2024-01-08'),
 	 (308,'2024-01-25','1638778M','Angel','Lorenzo','Caballero','angel.lorenzo.caballero@gmail.com','698073069','47008','2011-07-30','82','1','Izq.','Sol','1Izq.','El bazar de las sorpresas','Comedia','Alfred Kralik es el tímido jefe de vendedores de Matuschek y Compañía, una tienda de Budapest. Todas las mañanas, los empleados esperan juntos la llegada de su jefe, Hugo Matuschek. A pesar de su timidez, Alfred responde al anuncio de un periódico y mantiene un romance por carta. Su jefe decide contratar a una tal Klara Novak en contra de la opinión de Alfred. En el trabajo, Alfred discute constantemente con ella, sin sospechar que es su corresponsal secreta.','Ernst Lubitsch','2024-01-25',NULL);
+
+     -- completamos la tabla socio
+INSERT INTO socio (dni_pasaporte, nombre, apellido, fecha_nacimiento)
+SELECT DISTINCT
+dni,
+nombre,
+CONCAT(apellido_1,' ',apellido_2) AS apellido,
+CAST(fecha_nacimiento AS DATE)
+FROM tmp_videoclub;
+
+-- completamos la tabla domicilio
+INSERT INTO domicilio(id_socio, codigo_postal, calle, numero, piso)
+SELECT DISTINCT
+s.id,
+t.codigo_postal,
+t.calle,
+t.numero,
+t.piso
+FROM tmp_videoclub t
+INNER JOIN socio s ON t.dni = s.dni_pasaporte
+ORDER BY s.id;
+
+-- completamos la tabla telefono
+INSERT INTO telefono (id_socio, telefono)
+SELECT DISTINCT 
+s.id,
+t.telefono
+FROM tmp_videoclub t
+INNER JOIN socio s ON t.dni = s.dni_pasaporte
+ORDER BY s.id;
+
+-- completamos la tabla pelicula
+INSERT INTO pelicula(titulo, sinopsis)
+SELECT DISTINCT
+t.titulo,
+t.sinopsis
+FROM tmp_videoclub t
+ORDER BY t.titulo;
+
+-- completamos la tabla genero
+INSERT INTO genero(nombre)
+SELECT DISTINCT
+t.genero
+FROM tmp_videoclub t;
+
+-- completamos la tabla pelicula_genero
+INSERT INTO pelicula_genero(id_pelicula, id_genero)
+SELECT DISTINCT
+p.id AS pelicula,
+g.id AS genero
+FROM tmp_videoclub t
+INNER JOIN pelicula p ON p.titulo = t.titulo
+INNER JOIN genero g ON g.nombre = t.genero
+ORDER BY p.id;
+
+--completamos la tabla director
+INSERT INTO director(nombre, apellido)
+SELECT DISTINCT
+SPLIT_PART(t.director, ' ', 1) AS nombre,
+SPLIT_PART(t.director, ' ', 2) AS apellido
+FROM tmp_videoclub t;
+
+-- completamos la tabla pelicula_director
+INSERT INTO pelicula_director(id_pelicula, id_director)
+SELECT DISTINCT
+p.id AS pelicula,
+d.id AS director
+FROM tmp_videoclub t
+INNER JOIN pelicula p ON p.titulo = t.titulo
+INNER JOIN director d ON d.apellido = SPLIT_PART(t.director, ' ', 2)
+ORDER BY p.id;
+
+--  completamos la tabla copia
+INSERT INTO copia(id_pelicula)
+SELECT id_pelicula 
+FROM (
+SELECT DISTINCT p.id AS id_pelicula, t.titulo, CAST(t.id_copia AS INTEGER) AS id_copia
+FROM tmp_videoclub t
+INNER JOIN pelicula p ON t.titulo = p.titulo
+GROUP BY t.titulo, t.id_copia, p.id
+ORDER BY id_copia
+) AS subconsulta;
+
+--completamos la tabla alquiler
+INSERT INTO alquiler(fecha_inicio, fecha_fin, id_socio, id_copia)
+SELECT DISTINCT
+CAST(t.fecha_alquiler AS DATE), 
+CAST(t.fecha_devolucion AS DATE), 
+s.id AS id_socio,
+c.id AS id_copia
+FROM tmp_videoclub t
+INNER JOIN socio s ON s.dni_pasaporte = t.dni
+INNER JOIN pelicula p ON p.titulo = t.titulo
+INNER JOIN copia c ON c.id = t.id_copia 
+ORDER BY c.id, t.fecha_alquiler;
