@@ -104,3 +104,27 @@ ALTER TABLE pelicula_genero
 ADD CONSTRAINT fk_pg_genero
 FOREIGN KEY (id_genero) REFERENCES genero(id);
 
+CREATE TABLE tmp_videoclub (
+	id_copia INTEGER NULL,
+	fecha_alquiler_texto DATE NULL,
+	dni VARCHAR(50) NULL,
+	nombre VARCHAR(50) NULL,
+	apellido_1 VARCHAR(50) NULL,
+	apellido_2 VARCHAR(50) NULL,
+	email VARCHAR(50) NULL,
+	telefono VARCHAR(50) NULL,
+	codigo_postal VARCHAR(15) NULL,
+	fecha_nacimiento VARCHAR(50) NULL,
+	numero VARCHAR(5) NULL,
+	piso VARCHAR(5) NULL,
+	letra VARCHAR(5) NULL,
+	calle VARCHAR(50) NULL,
+	ext VARCHAR(50) NULL,
+	titulo VARCHAR(500) NULL,
+	genero VARCHAR(50) NULL,
+	sinopsis TEXT NULL,
+	director VARCHAR(100) NULL,
+	fecha_alquiler DATE NULL,
+	fecha_devolucion DATE NULL
+);
+
