@@ -68,3 +68,39 @@ CREATE TABLE IF NOT EXISTS genero(
     nombre VARCHAR(50) NOT NULL
 );
 
+ALTER TABLE copia
+ADD CONSTRAINT fk_copia_pelicula
+FOREIGN KEY (id_pelicula) REFERENCES pelicula(id);
+
+ALTER TABLE domicilio
+ADD CONSTRAINT fk_domicilio_socio
+FOREIGN KEY (id_socio) REFERENCES socio(id);
+
+ALTER TABLE telefono
+ADD CONSTRAINT fk_telefono_socio
+FOREIGN KEY (id_socio) REFERENCES socio(id);
+
+ALTER TABLE alquiler
+ADD CONSTRAINT fk_alquiler_socio
+FOREIGN KEY (id_socio) REFERENCES socio(id);
+
+ALTER TABLE alquiler
+ADD CONSTRAINT fk_alquiler_copia
+FOREIGN KEY (id_copia) REFERENCES copia(id);
+
+ALTER TABLE pelicula_director
+ADD CONSTRAINT fk_pd_pelicula
+FOREIGN KEY (id_pelicula) REFERENCES pelicula(id);
+
+ALTER TABLE pelicula_director
+ADD CONSTRAINT fk_pd_director
+FOREIGN KEY (id_director) REFERENCES director(id);
+
+ALTER TABLE pelicula_genero
+ADD CONSTRAINT fk_pg_pelicula
+FOREIGN KEY (id_pelicula) REFERENCES pelicula(id);
+
+ALTER TABLE pelicula_genero
+ADD CONSTRAINT fk_pg_genero
+FOREIGN KEY (id_genero) REFERENCES genero(id);
+
