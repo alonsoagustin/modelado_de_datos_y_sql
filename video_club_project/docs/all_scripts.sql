@@ -741,3 +741,12 @@ INNER JOIN socio s ON s.dni_pasaporte = t.dni
 INNER JOIN pelicula p ON p.titulo = t.titulo
 INNER JOIN copia c ON c.id = t.id_copia 
 ORDER BY c.id, t.fecha_alquiler;
+
+SELECT p.titulo AS titulo_pelicula, COUNT(c.id) AS cantidad_copias FROM pelicula p
+LEFT JOIN copia c ON c.id_pelicula = p.id
+LEFT JOIN alquiler a ON a.id_copia = c.id
+AND a.fecha_inicio IS NOT NULL
+AND a.fecha_fin IS NULL
+WHERE a.id IS null
+GROUP BY p.titulo
+ORDER BY p.titulo;
